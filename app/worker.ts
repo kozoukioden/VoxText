@@ -4,10 +4,11 @@ import { pipeline, env } from '@xenova/transformers';
 // Skip local model checks since we are running in the browser
 env.allowLocalModels = false;
 env.useBrowserCache = true;
+// env.backends.onnx.wasm.numThreads = 1;
 
 class PipelineSingleton {
     static task = 'automatic-speech-recognition';
-    static model = 'openai/whisper-tiny';
+    static model = 'Xenova/whisper-tiny'; // Default model ID fixed
     static instance: any = null;
 
     static async getInstance(progress_callback: any = null, modelName: any = null) {
@@ -35,7 +36,8 @@ self.addEventListener('message', async (event) => {
             }, data?.model); // Pass model name if provided
             self.postMessage({ type: 'ready' });
         } catch (error: any) {
-            self.postMessage({ type: 'error', data: error.message });
+            console.error("Worker Load Error:", error);
+            self.postMessage({ type: 'error', data: error?.message || "Unknown error (load)" });
         }
     } else if (type === 'transcribe') {
         try {
@@ -52,7 +54,8 @@ self.addEventListener('message', async (event) => {
 
             self.postMessage({ type: 'complete', data: output });
         } catch (error: any) {
-            self.postMessage({ type: 'error', data: error.message });
+            console.error("Worker Transcribe Error:", error);
+            self.postMessage({ type: 'error', data: error?.message || "Unknown error (transcribe)" });
         }
     }
 });

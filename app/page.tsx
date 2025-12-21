@@ -6,6 +6,7 @@ import { AudioUploader } from '@/components/AudioUploader';
 import { ModelSelector } from '@/components/ModelSelector';
 import { Mic, Download, Sparkles, Loader2, FileText, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function Home() {
   const [model, setModel] = useState('Xenova/whisper-tiny');
@@ -15,18 +16,26 @@ export default function Home() {
 
   // Initialize (load model) when model or ready state changes
   useEffect(() => {
-    // Only init if we haven't already or if model changed.
-    // But since init loads the model, we can call it.
-    // Ideally we wait for user action, but pre-loading is nice.
-    // Let's load on first render or model change.
-    if (!isTranscribing) { // Dont switch mid-transcription
+    if (!isTranscribing) {
       init(model);
     }
   }, [init, model]);
 
-  const handleTranscribe = () => {
+  // Toast notifications based on state
+  useEffect(() => {
+    if (progress?.status === 'error') {
+      toast.error(`Error: ${progress.data}`);
+    }
+  }, [progress]);
+
+  const handleTranscribe = async () => {
     if (!audioData) return;
-    start(audioData, model);
+    toast.info("Starting transcription...");
+    try {
+      await start(audioData, model);
+    } catch (e: any) {
+      toast.error(e.message || "Failed to start transcription");
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -54,6 +63,7 @@ export default function Home() {
     a.href = url;
     a.download = `${fileName || 'transcript'}.txt`;
     a.click();
+    toast.success("Transcript downloaded!");
   };
 
   return (
@@ -96,6 +106,7 @@ export default function Home() {
                   onAudioLoaded={(buffer, name) => {
                     setAudioData(buffer);
                     setFileName(name);
+                    toast.success("Audio loaded successfully!");
                   }}
                 />
               </div>
@@ -113,7 +124,7 @@ export default function Home() {
                       style={{ width: `${progress.progress}%` }}
                     />
                   </div>
-                  <p className="text-xs text-gray-500">{progress.file}</p>
+                  <p className="text-xs text-gray-500 truncate">{progress.file}</p>
                 </div>
               )}
 
@@ -171,13 +182,13 @@ export default function Home() {
                 )}
 
                 {transcript && typeof transcript.text === 'string' && (
-                  <div className="whitespace-pre-wrap">{transcript.text}</div>
+                  <div className="whitespace-pre-wrap animate-in fade-in duration-500">{transcript.text}</div>
                 )}
 
                 {transcript && Array.isArray(transcript.chunks) && (
                   <div className="space-y-2">
                     {transcript.chunks.map((chunk: any, i: number) => (
-                      <div key={i} className="flex gap-4 hover:bg-white/5 p-2 rounded transition-colors group">
+                      <div key={i} className="flex gap-4 hover:bg-white/5 p-2 rounded transition-colors group animate-in slide-in-from-bottom-2 fade-in duration-300">
                         <span className="text-blue-500/50 text-xs mt-1 select-none group-hover:text-blue-400">
                           {chunk.timestamp && `[${chunk.timestamp[0].toFixed(2)} - ${chunk.timestamp[1].toFixed(2)}]`}
                         </span>
