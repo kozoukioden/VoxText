@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Antigravity Scribe 🎙️
+
+A free, unlimited, and privacy-focused audio transcription web application running entirely in your browser.
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![Transformers.js](https://img.shields.io/badge/AI-Transformers.js-yellow)
+
+## Features
+
+- **🔒 Privacy First**: All transcription happens locally on your device using WebGPU/WASM. No audio is ever uploaded to a server.
+- **♾️ Unlimited Duration**: Transcribe meetings, lectures, or interviews of any length (1hr+ supported).
+- **💸 100% Free**: No API keys, no subscriptions, no pay-per-minute costs.
+- **🧠 Model Selection**: Choose between `Tiny` (Fastest), `Base` (Balanced), and `Small` (High Accuracy) Whisper models.
+- **🎨 Premium UI**: Built with Shadcn/UI, TailwindCSS, and a sleek dark mode aesthetic.
+- **📂 Drag & Drop**: Easy file upload support for MP3, WAV, M4A, and more.
+- **⚡ Offline Capable**: Once the model is loaded, it runs without an internet connection.
+
+## How it Works
+
+This application uses [Transformers.js](https://huggingface.co/docs/transformers.js) to run OpenAI's Whisper model directly in your browser via a Web Worker. This ensures the main UI remains responsive while the heavy processing happens in the background.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 18+ installed.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/kozoukioden/antigravity-scribe.git
+    cd antigravity-scribe
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-## Learn More
+3.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+4.  Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Vercel (Recommended)
 
-## Deploy on Vercel
+This project is optimized for Vercel. Since it is a static client-side app (with a Next.js wrapper), it deploys seamlessly.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkozoukioden%2Fantigravity-scribe)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **AI Engine**: @xenova/transformers (Whisper)
+- **Icons**: Lucide React
+
+## License
+
+MIT
