@@ -52,7 +52,7 @@ This application uses [Transformers.js](https://huggingface.co/docs/transformers
 
 This project is optimized for Vercel. Since it is a static client-side app (with a Next.js wrapper), it deploys seamlessly.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkozoukioden%2FVoxText)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkozoukioden%2FVoxText&project-name=voxtext)
 
 ## Tech Stack
 
