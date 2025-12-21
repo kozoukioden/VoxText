@@ -13,28 +13,54 @@ export default function Home() {
   const { ready, progress, isTranscribing, transcript, start, init } = useTranscriber();
   const [audioData, setAudioData] = useState<AudioBuffer | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [statusLog, setStatusLog] = useState<string[]>([]);
+  const [isModelLoading, setIsModelLoading] = useState(false);
+
+  const addLog = (msg: string) => setStatusLog(prev => [...prev.slice(-4), `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
   // Initialize (load model) when model or ready state changes
   useEffect(() => {
-    if (!isTranscribing) {
+    if (!isTranscribing && !ready && !isModelLoading) {
+      addLog(`Initializing model: ${model}...`);
+      setIsModelLoading(true);
       init(model);
     }
-  }, [init, model]);
+  }, [init, model, ready, isTranscribing, isModelLoading]);
+
+  useEffect(() => {
+    if (ready) {
+      setIsModelLoading(false);
+      addLog("Model loaded. Ready to transcribe.");
+      toast.success("Ready to transcribe!");
+    }
+  }, [ready]);
 
   // Toast notifications based on state
   useEffect(() => {
+    if (progress?.status === 'progress') {
+      // Optional: Don't spam logs, just UI bar
+    }
+    if (progress?.status === 'ready') {
+      addLog("Model download complete.");
+    }
     if (progress?.status === 'error') {
-      toast.error(`Error: ${progress.data}`);
+      const errorMsg = `Error: ${progress.data}`;
+      toast.error(errorMsg);
+      addLog(errorMsg);
+      setIsModelLoading(false);
     }
   }, [progress]);
 
   const handleTranscribe = async () => {
     if (!audioData) return;
     toast.info("Starting transcription...");
+    addLog("Starting transcription...");
     try {
       await start(audioData, model);
     } catch (e: any) {
-      toast.error(e.message || "Failed to start transcription");
+      const msg = e.message || "Failed to start transcription";
+      toast.error(msg);
+      addLog(`Error: ${msg}`);
     }
   };
 
@@ -145,6 +171,17 @@ export default function Home() {
                   <span className="font-medium">Transcribing...</span>
                 </div>
               )}
+
+              {/* Status Log */}
+              <div className="p-4 bg-black/40 border border-white/5 rounded-xl space-y-2 max-h-40 overflow-y-auto">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">Status Log</p>
+                <div className="space-y-1">
+                  {statusLog.length === 0 && <p className="text-xs text-gray-600 italic">Waiting for activity...</p>}
+                  {statusLog.map((log, i) => (
+                    <p key={i} className="text-xs text-gray-400 font-mono">{log}</p>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Right Column: Output */}
