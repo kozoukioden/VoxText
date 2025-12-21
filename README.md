@@ -1,4 +1,4 @@
-# Antigravity Scribe 🎙️
+# VoxText 🎙️
 
 A free, unlimited, and privacy-focused audio transcription web application running entirely in your browser.
 
@@ -30,8 +30,8 @@ This application uses [Transformers.js](https://huggingface.co/docs/transformers
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/kozoukioden/antigravity-scribe.git
-    cd antigravity-scribe
+    git clone https://github.com/kozoukioden/VoxText.git
+    cd VoxText
     ```
 
 2.  Install dependencies:
@@ -52,7 +52,7 @@ This application uses [Transformers.js](https://huggingface.co/docs/transformers
 
 This project is optimized for Vercel. Since it is a static client-side app (with a Next.js wrapper), it deploys seamlessly.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkozoukioden%2Fantigravity-scribe)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fkozoukioden%2FVoxText)
 
 ## Tech Stack
 

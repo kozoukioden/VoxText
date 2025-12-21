@@ -62,7 +62,7 @@ export default function Home() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2">
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-            Antigravity Scribe
+            VoxText
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl">
             Free, unlimited, privacy-first audio transcription. Running entirely on your device using WebGPU.
