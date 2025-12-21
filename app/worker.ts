@@ -48,7 +48,15 @@ self.addEventListener('message', async (event) => {
             const output = await transcriber(data.audio, {
                 ...data.options,
                 callback_function: (x: any) => {
-                    self.postMessage({ type: 'update', data: x });
+                    // Sanitize data to avoid DataCloneError if x contains non-serializable objects
+                    if (x && typeof x === 'object') {
+                        // Only send text if available, or simple serializable properties
+                        const safeData = {
+                            text: x.text || "",
+                            // timestamps: x.chunks // timestamps might be complex, let's skip for partial updates to be safe
+                        };
+                        self.postMessage({ type: 'update', data: safeData });
+                    }
                 }
             });
 
