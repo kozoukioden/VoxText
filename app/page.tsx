@@ -3,18 +3,20 @@
 import { useEffect, useState } from 'react';
 import { useTranscriber } from '@/hooks/useTranscriber';
 import { AudioUploader } from '@/components/AudioUploader';
-import { ModelSelector } from '@/components/ModelSelector';
-import { Mic, Download, Sparkles, Loader2, FileText, Globe } from 'lucide-react';
+import { Mic, Download, Sparkles, Loader2, FileText, Globe, File, FileCode, FileType } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import { jsPDF } from "jspdf";
 
 export default function Home() {
-  const [model, setModel] = useState('Xenova/whisper-tiny');
+  const [model] = useState('Xenova/whisper-tiny'); // Fixed model
   const { ready, progress, isTranscribing, transcript, start, init } = useTranscriber();
   const [audioData, setAudioData] = useState<AudioBuffer | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [statusLog, setStatusLog] = useState<string[]>([]);
   const [isModelLoading, setIsModelLoading] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const addLog = (msg: string) => setStatusLog(prev => [...prev.slice(-4), `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
@@ -64,32 +66,67 @@ export default function Home() {
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    return `${h > 0 ? h + ':' : ''}${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  const getTranscriptText = () => {
+    if (!transcript) return "";
+    if (Array.isArray(transcript.chunks)) {
+      return transcript.chunks.map((c: any) => `[${c.timestamp[0].toFixed(2)} -> ${c.timestamp[1].toFixed(2)}] ${c.text}`).join('\n');
+    } else if (transcript.text) {
+      return transcript.text;
+    }
+    return "";
   };
 
-  // Prepare transcript text for download
-  const handleDownload = () => {
-    if (!transcript) return;
-    let text = "";
-    if (Array.isArray(transcript.chunks)) {
-      text = transcript.chunks.map((c: any) => `[${c.timestamp[0]} -> ${c.timestamp[1]}] ${c.text}`).join('\n');
-    } else if (transcript.text) {
-      text = transcript.text;
-    } else {
-      text = JSON.stringify(transcript, null, 2);
-    }
-
+  const exportTxt = () => {
+    const text = getTranscriptText();
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `${fileName || 'transcript'}.txt`;
     a.click();
-    toast.success("Transcript downloaded!");
+    toast.success("Exported as .txt");
+  };
+
+  const exportDocx = async () => {
+    const text = getTranscriptText();
+    const doc = new Document({
+      sections: [{
+        properties: {},
+        children: text.split('\n').map(line => new Paragraph({
+          children: [new TextRun(line)],
+        })),
+      }],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName || 'transcript'}.docx`;
+    a.click();
+    toast.success("Exported as .docx");
+  };
+
+  const exportPdf = () => {
+    const text = getTranscriptText();
+    const doc = new jsPDF();
+
+    // Simple word wrap
+    const splitText = doc.splitTextToSize(text, 180);
+    let y = 10;
+    doc.setFontSize(12);
+
+    splitText.forEach((line: string) => {
+      if (y > 280) {
+        doc.addPage();
+        y = 10;
+      }
+      doc.text(line, 10, y);
+      y += 7;
+    });
+
+    doc.save(`${fileName || 'transcript'}.pdf`);
+    toast.success("Exported as .pdf");
   };
 
   return (
@@ -117,15 +154,6 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Left Column: Input */}
             <div className="w-full lg:w-1/3 space-y-6">
-              <div className="space-y-4">
-                <label className="text-sm font-medium text-gray-400 uppercase tracking-wider">Settings</label>
-                <ModelSelector
-                  currentModel={model}
-                  onModelChange={setModel}
-                  disabled={isTranscribing}
-                />
-              </div>
-
               <div className="space-y-4">
                 <label className="text-sm font-medium text-gray-400 uppercase tracking-wider">Audio Source</label>
                 <AudioUploader
@@ -192,13 +220,32 @@ export default function Home() {
                   Transcript
                 </h2>
                 {transcript && (
-                  <button
-                    onClick={handleDownload}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-sm font-medium text-white rounded-lg transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    Export
-                  </button>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowExportMenu(!showExportMenu)}
+                      className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-sm font-medium text-white rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export
+                    </button>
+
+                    {showExportMenu && (
+                      <>
+                        <div className="fixed inset-0 z-10" onClick={() => setShowExportMenu(false)} />
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl z-20 py-2 animate-in fade-in slide-in-from-top-2">
+                          <button onClick={exportTxt} className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                            <FileCode className="w-4 h-4" /> Text (.txt)
+                          </button>
+                          <button onClick={exportDocx} className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                            <File className="w-4 h-4" /> Word (.docx)
+                          </button>
+                          <button onClick={exportPdf} className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                            <FileType className="w-4 h-4" /> PDF (.pdf)
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
 
