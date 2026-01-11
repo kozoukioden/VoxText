@@ -141,11 +141,7 @@ export default function Home() {
             Free, unlimited, privacy-first audio transcription. Running entirely on your device using WebGPU.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <a href="https://github.com/oguzhakan94" target="_blank" className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
-            <Globe className="w-5 h-5 text-gray-400" />
-          </a>
-        </div>
+
       </div>
 
       {/* Controls */}
