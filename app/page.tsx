@@ -92,7 +92,7 @@ export default function Home() {
     const doc = new Document({
       sections: [{
         properties: {},
-        children: text.split('\n').map(line => new Paragraph({
+        children: text.split('\n').map((line: string) => new Paragraph({
           children: [new TextRun(line)],
         })),
       }],
