@@ -121,7 +121,7 @@ export function AudioUploader({ onAudioLoaded }: AudioUploaderProps) {
                 ref={inputRef}
                 type="file"
                 className="hidden"
-                accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac"
+                accept="audio/mpeg,audio/wav,audio/x-m4a,audio/mp4,audio/aac,audio/ogg,audio/webm,audio/flac"
                 onChange={handleFileChange}
             />
         </div>
