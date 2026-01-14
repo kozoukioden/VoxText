@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranscriber } from '@/hooks/useTranscriber';
 import { AudioUploader } from '@/components/AudioUploader';
+import { ModelSelector } from '@/components/ModelSelector';
 import { Mic, Download, Sparkles, Loader2, FileText, Globe, File, FileCode, FileType } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -10,7 +11,7 @@ import { Document, Packer, Paragraph, TextRun } from "docx";
 import { jsPDF } from "jspdf";
 
 export default function Home() {
-  const [model] = useState('Xenova/whisper-tiny'); // Fixed model
+  const [model, setModel] = useState('Xenova/whisper-tiny');
   const { ready, progress, isTranscribing, transcript, start, init } = useTranscriber();
   const [audioData, setAudioData] = useState<AudioBuffer | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -150,6 +151,15 @@ export default function Home() {
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Left Column: Input */}
             <div className="w-full lg:w-1/3 space-y-6">
+              <div className="space-y-4">
+                <label className="text-sm font-medium text-gray-400 uppercase tracking-wider">Settings</label>
+                <ModelSelector
+                  currentModel={model}
+                  onModelChange={setModel}
+                  disabled={isTranscribing}
+                />
+              </div>
+
               <div className="space-y-4">
                 <label className="text-sm font-medium text-gray-400 uppercase tracking-wider">Audio Source</label>
                 <AudioUploader
